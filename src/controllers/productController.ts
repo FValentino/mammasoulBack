@@ -1,55 +1,90 @@
-import { Request, Response } from "express"
-import { AppDataSource } from "../config/db"
-import { Product } from "../models/Products"
+import { Request, Response } from "express";
+import { AppDataSource } from "../config/db";
+import { Product } from "../models/Products";
 
-const productRepository = AppDataSource.getRepository(Product)
+const productRepository = AppDataSource.getRepository(Product);
 
-// get all products
-export const getProducts = async (_req: Request, res: Response) => {
-  const products = await productRepository.find()
-
-  res.json(products)
-}
-
-// get one product
-export const getProduct = async (req: Request, res: Response) => {
-  const product = await productRepository.findOneBy({ id: Number(req.params.id) })
-
-  if (!product) {
-    return res.status(404).json({ message: "Producto no encontrado" })
+// Obtener todos los productos
+export const getProducts = async (_req: Request, res: Response): Promise<Response> => {
+  try {
+    const products = await productRepository.find();
+    return res.json(products);
+  } catch (error) {
+    return res.status(500).json({ message: "Error al obtener productos", error });
   }
+};
 
-  return res.json(product)
-}
+// Obtener un producto por ID
+export const getProductById = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID no válido" });
+    }
+
+    const product = await productRepository.findOneBy({ id });
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    return res.json(product);
+  } catch (error) {
+    return res.status(500).json({ message: "Error al obtener el producto", error });
+  }
+};
 
 // Crear un nuevo producto
-export const createProduct = async (req: Request, res: Response) => {
-  const { name, price, description } = req.body;
-  const newProduct = productRepository.create({ name, price, description });
-  await productRepository.save(newProduct);
-  res.status(201).json(newProduct);
+export const createProduct = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { name, price, description } = req.body;
+    if (!name || !price) {
+      return res.status(400).json({ message: "Nombre y precio son requeridos" });
+    }
+
+    const newProduct = productRepository.create({ name, price, description });
+    await productRepository.save(newProduct);
+    return res.status(201).json(newProduct);
+  } catch (error) {
+    return res.status(500).json({ message: "Error al crear el producto", error });
+  }
 };
 
 // Actualizar un producto
-export const updateProduct = async (req: Request, res: Response) => {
-  const id = Number(req.params.id);
-  const product = await productRepository.findOneBy({ id });
+export const updateProduct = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID no válido" });
+    }
 
-  if (!product) {
-    return res.status(404).json({ message: "Producto no encontrado" })
-  };
+    const product = await productRepository.findOneBy({ id });
+    if (!product) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
 
-  productRepository.merge(product, req.body);
-  await productRepository.save(product);
-  return res.json(product);
+    productRepository.merge(product, req.body);
+    await productRepository.save(product);
+    return res.json(product);
+  } catch (error) {
+    return res.status(500).json({ message: "Error al actualizar el producto", error });
+  }
 };
 
 // Eliminar un producto
-export const deleteProduct = async (req: Request, res: Response) => {
-  const result = await productRepository.delete(Number(req.params.id));
-  if (result.affected === 0) {
-    return res.status(404).json({ message: "Producto no encontrado" })
-  };
+export const deleteProduct = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const id = Number(req.params.id);
+    if (isNaN(id)) {
+      return res.status(400).json({ message: "ID no válido" });
+    }
 
-  return res.status(204).send();
+    const result = await productRepository.delete(id);
+    if (result.affected === 0) {
+      return res.status(404).json({ message: "Producto no encontrado" });
+    }
+
+    return res.status(204).send();
+  } catch (error) {
+    return res.status(500).json({ message: "Error al eliminar el producto", error });
+  }
 };
