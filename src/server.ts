@@ -1,16 +1,13 @@
-import express from 'express'
+import app from "./app";
+import { initializeDB } from "./config/db";
 
-const app = express()
+const PORT = process.env.PORT || 3000;
 
-app.use(express.json())
+const startServer = async () => {
+  await initializeDB();
+  app.listen(PORT, () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
+  });
+};
 
-const desirePort = process.env.PORT
-
-app.get('/ping', (_, res) => {
-  console.log('Entro en /ping')
-  res.send('pong')
-})
-
-app.listen(desirePort, () => {
-  console.log(`Server running on port ${desirePort}`)
-})
+startServer();
