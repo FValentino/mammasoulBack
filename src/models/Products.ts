@@ -13,5 +13,5 @@ export class Product {
   price!: number
 
   @Column()
-  descrition!: string
+  description!: string
 }
