@@ -1,11 +1,11 @@
-import { Request, Response } from "express";
+import type { Request, Response } from "express";
 import { AppDataSource } from "../config/db";
-import { Product } from "../models/Products";
+const Product = require("../models/Products").Product;
 
 const productRepository = AppDataSource.getRepository(Product);
 
 // Obtener todos los productos
-export const getProducts = async (_req: Request, res: Response): Promise<Response> => {
+const getProducts = async (_req: Request, res: Response): Promise<Response> => {
   try {
     const products = await productRepository.find();
     return res.json(products);
@@ -15,7 +15,7 @@ export const getProducts = async (_req: Request, res: Response): Promise<Respons
 };
 
 // Obtener un producto por ID
-export const getProductById = async (req: Request, res: Response): Promise<Response> => {
+const getProductById = async (req: Request, res: Response): Promise<Response> => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
@@ -34,7 +34,7 @@ export const getProductById = async (req: Request, res: Response): Promise<Respo
 };
 
 // Crear un nuevo producto
-export const createProduct = async (req: Request, res: Response): Promise<Response> => {
+const createProduct = async (req: Request, res: Response): Promise<Response> => {
   try {
     const { name, price, description } = req.body;
     if (!name || !price) {
@@ -50,7 +50,7 @@ export const createProduct = async (req: Request, res: Response): Promise<Respon
 };
 
 // Actualizar un producto
-export const updateProduct = async (req: Request, res: Response): Promise<Response> => {
+const updateProduct = async (req: Request, res: Response): Promise<Response> => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
@@ -71,7 +71,7 @@ export const updateProduct = async (req: Request, res: Response): Promise<Respon
 };
 
 // Eliminar un producto
-export const deleteProduct = async (req: Request, res: Response): Promise<Response> => {
+const deleteProduct = async (req: Request, res: Response): Promise<Response> => {
   try {
     const id = Number(req.params.id);
     if (isNaN(id)) {
@@ -87,4 +87,13 @@ export const deleteProduct = async (req: Request, res: Response): Promise<Respon
   } catch (error) {
     return res.status(500).json({ message: "Error al eliminar el producto", error });
   }
+};
+
+// Exportar las funciones en CommonJS
+export = {
+  getProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
 };

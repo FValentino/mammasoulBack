@@ -6,11 +6,11 @@ dotenv.config()
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: process.env.DB_HOST,
-  port: Number(process.env.PORT),
-  username: process.env.USERNAME,
-  password: process.env.PASSWORD,
-  database: process.env.DATABASE,
+  host: "localhost",
+  port: 5432,
+  username: "postgres",
+  password: "valu386060",
+  database: "mammasoul",
   entities: ["src/models/*.ts"],
   migrations: ["src/migrations/*.ts"],
   subscribers: []

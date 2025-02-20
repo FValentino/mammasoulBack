@@ -1,7 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+const { Entity, PrimaryGeneratedColumn, Column } = require("typeorm")
 
 @Entity()
-export class Product {
+class Product {
 
   @PrimaryGeneratedColumn()
   id!: number
@@ -15,3 +15,5 @@ export class Product {
   @Column()
   description!: string
 }
+
+module.exports = Product
